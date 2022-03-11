@@ -152,20 +152,20 @@ class Application extends BaseApplication
            'queryParam' => 'redirect',
        ]);
 
-       // Charge les identifiants et s'assure que nous vérifions les champs e-mail et mot de passe
+       // Charge les identifiants et s'assure que nous vérifions les champs pseudo et mot de passe
        $authenticationService->loadIdentifier('Authentication.Password', [
            'fields' => [
-               'username' => 'username',
+               'pseudo' => 'pseudo',
                'password' => 'password',
            ]
        ]);
 
        // Charge les authenticators, nous voulons celui de session en premier
        $authenticationService->loadAuthenticator('Authentication.Session');
-       // Configure la vérification des données du formulaire pour choisir l'email et le mot de passe
+       // Configure la vérification des données du formulaire pour choisir le pseudo et le mot de passe
        $authenticationService->loadAuthenticator('Authentication.Form', [
            'fields' => [
-               'username' => 'username',
+               'pseudo' => 'pseudo',
                'password' => 'password',
            ],
            'loginUrl' => Router::url('/users/login'),

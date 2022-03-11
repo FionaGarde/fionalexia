@@ -116,28 +116,34 @@ class UsersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function login(){
+    public function login()
+{
+    $this->request->allowMethod(['get', 'post']);
+    $result = $this->Authentication->getResult();
+    // indépendamment de POST ou GET, rediriger si l'utilisateur est connecté
+    if ($result->isValid()) {
+        // rediriger vers /articles après la connexion réussie
+        $redirect = $this->request->getQuery('redirect', [
+            'controller' => 'Dashboards',
+            'action' => 'index',
+        ]);
 
-        $this->request->allowMethod(['get', 'post']);
-        $result = $this->Authentication->getResult();
-        // indépendamment de POST ou GET, rediriger si l'utilisateur est connecté
-        if ($result->isValid()) {
-            // rediriger vers /articles après la connexion réussie
-            return $this->redirect($this->request->getQuery('redirect', ['controller' => 'Dashboards', 'action' => 'index']));
-
-        }
-
-        $this->Flash->error('Identifiants inconnus');
+        return $this->redirect($redirect);
     }
-
-    public function logout(){
-
-        $result = $this->Authentication->getResult();
-        if($result->isValid()){
-            $this->Authentication->logout();
-            $this->Flash->success('À bientôt');
-        }
-
-        return $this->redirect($this->request->getQuery('redirect', ['controller' => 'Users', 'action' => 'login']));
+    // afficher une erreur si l'utilisateur a soumis un formulaire
+    // et que l'authentification a échoué
+    if ($this->request->is('post') && !$result->isValid()) {
+        $this->Flash->error(__('Votre identifiant ou votre mot de passe est incorrect.'));
     }
+}
+
+    public function logout()
+{
+    $result = $this->Authentication->getResult();
+    // indépendamment de POST ou GET, rediriger si l'utilisateur est connecté
+    if ($result->isValid()) {
+        $this->Authentication->logout();
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+}
 }
